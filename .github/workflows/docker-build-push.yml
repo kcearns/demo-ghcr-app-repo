@@ -79,5 +79,5 @@ jobs:
           gh pr create \
             --title "Update image tag to ${VERSION}" \
             --body "Updates the image tag to ${VERSION}" \
-            --repo your-org/infrastructure-repo \
+            --repo kcearns/demo-ghcr-helm-repo \
             --base main 
