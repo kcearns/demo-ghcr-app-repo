@@ -2,11 +2,15 @@ name: Build and Push Docker Image
 
 on:
   push:
-    # branches: [ "main" ]
     tags:
       - 'staging-v*.*.*'
   pull_request:
-    branches: [ "main" ]
+    branches: 
+      - 'staging'
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 env:
   REGISTRY: ghcr.io
@@ -18,6 +22,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+    if: github.base_ref == 'staging'  # Only run if the PR targets staging branch
 
     steps:
       - name: Checkout repository
