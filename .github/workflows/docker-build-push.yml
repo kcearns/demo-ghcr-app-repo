@@ -82,5 +82,13 @@ jobs:
             --repo kcearns/demo-ghcr-helm-repo \
             --base main)
 
-          # Enable auto-merge
-          gh pr merge "$PR_URL" --auto --merge --delete-branch 
+          # Wait briefly for PR checks to initialize
+          sleep 10
+
+          # Enable auto-merge with retries
+          for i in {1..3}; do
+            if gh pr merge "$PR_URL" --auto --merge --delete-branch; then
+              break
+            fi
+            sleep 5
+          done 
