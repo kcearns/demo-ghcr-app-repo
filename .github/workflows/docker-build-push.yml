@@ -2,7 +2,7 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ "main" ]
+    # branches: [ "main" ]
     tags:
       - 'v*.*.*'
   pull_request:
@@ -75,13 +75,12 @@ jobs:
           git commit -m "chore: update image tag to ${VERSION}"
           git push origin update-image-tag-${VERSION}
           
-          # Create Pull Request
+          # Create Pull Request and capture URL
           PR_URL=$(gh pr create \
             --title "Update image tag to ${VERSION}" \
             --body "Updates the image tag to ${VERSION}" \
             --repo kcearns/demo-ghcr-helm-repo \
-            --base main \
-            --json url -q '.url')
+            --base main)
 
           # Enable auto-merge
-          gh pr merge $PR_URL --auto --merge --delete-branch 
+          gh pr merge "$PR_URL" --auto --merge --delete-branch 
