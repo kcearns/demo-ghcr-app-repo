@@ -39,10 +39,45 @@ jobs:
             type=semver,pattern={{version}}
             type=raw,value=latest,enable={{is_default_branch}}
 
+      - name: Install yq
+        run: |
+          wget https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -O /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }} 
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Update Helm values in infrastructure repo
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}  # Personal Access Token with repo scope
+          VERSION: ${{ github.ref_name }}     # Will be the tag name like v1.0.0
+        run: |
+          # Clone the infrastructure repository
+          git clone https://x-access-token:${GH_TOKEN}@github.com/kcearns/demo-ghcr-helm-repo.git
+          cd infrastructure-repo
+          
+          # Create a new branch
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "GitHub Actions"
+          git checkout -b update-image-tag-${VERSION}
+          
+          # Update the values file using yq
+          yq -i '.image.tag = env(VERSION)' ./values.yaml
+          
+          # Commit and push changes
+          git add ./path/to/values.yaml
+          git commit -m "chore: update image tag to ${VERSION}"
+          git push origin update-image-tag-${VERSION}
+          
+          # Create Pull Request
+          gh pr create \
+            --title "Update image tag to ${VERSION}" \
+            --body "Updates the image tag to ${VERSION}" \
+            --repo your-org/infrastructure-repo \
+            --base main 
