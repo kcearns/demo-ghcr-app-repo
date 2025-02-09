@@ -4,7 +4,7 @@ on:
   push:
     # branches: [ "main" ]
     tags:
-      - 'v*.*.*'
+      - 'staging-v*.*.*'
   pull_request:
     branches: [ "main" ]
 
@@ -36,7 +36,7 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=semver,pattern={{version}}
+            type=semver,pattern=staging-v{{version}}
             type=raw,value=latest,enable={{is_default_branch}}
 
       - name: Install yq
