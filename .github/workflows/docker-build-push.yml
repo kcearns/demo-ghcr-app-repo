@@ -60,7 +60,7 @@ jobs:
         run: |
           # Clone the infrastructure repository
           git clone https://x-access-token:${GH_TOKEN}@github.com/kcearns/demo-ghcr-helm-repo.git
-          cd infrastructure-repo
+          cd demo-ghcr-helm-repo
           
           # Create a new branch
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
