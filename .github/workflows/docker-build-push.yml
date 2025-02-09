@@ -55,8 +55,8 @@ jobs:
       - name: Update Helm values in infrastructure repo
         if: startsWith(github.ref, 'refs/tags/')
         env:
-          GH_TOKEN: ${{ secrets.PAT_TOKEN }}  # Personal Access Token with repo scope
-          VERSION: ${{ github.ref_name }}     # Will be the tag name like v1.0.0
+          GH_TOKEN: ${{ secrets.PAT_TOKEN }}
+          VERSION: ${{ github.ref_name }}
         run: |
           # Clone the infrastructure repository
           git clone https://x-access-token:${GH_TOKEN}@github.com/kcearns/demo-ghcr-helm-repo.git
@@ -75,9 +75,14 @@ jobs:
           git commit -m "chore: update image tag to ${VERSION}"
           git push origin update-image-tag-${VERSION}
           
-          # Create Pull Request
+          # Create Pull Request with auto-merge enabled
           gh pr create \
             --title "Update image tag to ${VERSION}" \
             --body "Updates the image tag to ${VERSION}" \
             --repo kcearns/demo-ghcr-helm-repo \
-            --base main 
+            --base main \
+            --auto-merge
+
+          # Enable auto-merge explicitly in case the flag doesn't work
+          PR_URL=$(gh pr view --json url -q .url)
+          gh pr merge $PR_URL --auto --merge 
