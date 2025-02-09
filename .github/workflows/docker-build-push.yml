@@ -75,14 +75,13 @@ jobs:
           git commit -m "chore: update image tag to ${VERSION}"
           git push origin update-image-tag-${VERSION}
           
-          # Create Pull Request with auto-merge enabled
-          gh pr create \
+          # Create Pull Request
+          PR_URL=$(gh pr create \
             --title "Update image tag to ${VERSION}" \
             --body "Updates the image tag to ${VERSION}" \
             --repo kcearns/demo-ghcr-helm-repo \
             --base main \
-            --auto-merge
+            --json url -q '.url')
 
-          # Enable auto-merge explicitly in case the flag doesn't work
-          PR_URL=$(gh pr view --json url -q .url)
-          gh pr merge $PR_URL --auto --merge 
+          # Enable auto-merge
+          gh pr merge $PR_URL --auto --merge --delete-branch 
